@@ -1,0 +1,36 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: yml_lint
+    image: sdesbure/yamllint:latest
+    commands:
+      - yamllint .drone.yml
+  - name: rust_lint
+    image: rust:1.53
+    commands:
+      - cargo clippy
+  - name: dockerfile_lint
+    image: hadolint/hadolint:2.5.0-alpine
+    commands:
+      - hadolint Dockerfile
+  - name: docker_latest
+    image: plugins/docker:19.03.8
+    settings:
+      username: hsmtkk
+      password:
+        from_secret: dockerhub_token
+      repo: hsmtkk/whoami-rust
+      tags:
+        - latest
+  - name: web
+    environment:
+      HTTP_PORT: 8000
+    image: hsmtkk/whoami-rust:latest
+    detach: true
+  - name: web_test
+    image: curlimages/curl
+    commands:
+      - curl http://web:8000
