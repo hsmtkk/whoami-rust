@@ -10,6 +10,6 @@ RUN cargo install --path .
 
 FROM ubuntu:20.04
 
-COPY --from=builder /usr/local/foo/whoami-rust /opt/whoami-rust
+COPY --from=builder /usr/local/cargo/bin/whoami-rust /usr/local/bin/whoami-rust
 
-ENTRYPOINT ["/opt/whoami-rust"]
+ENTRYPOINT ["/usr/local/bin/whoami-rust"]
