@@ -7,7 +7,7 @@ steps:
   - name: yml_lint
     image: sdesbure/yamllint:latest
     commands:
-      - yamllint .drone.yml
+      - yamllint -d relaxed .drone.yml
   - name: rust_lint
     image: rust:1.53
     commands:
