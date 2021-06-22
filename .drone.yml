@@ -11,6 +11,7 @@ steps:
   - name: rust_lint
     image: rust:1.53
     commands:
+      - rustup component add clippy
       - cargo clippy
   - name: dockerfile_lint
     image: hadolint/hadolint:2.5.0-alpine
@@ -25,12 +26,27 @@ steps:
       repo: hsmtkk/whoami-rust
       tags:
         - latest
+    when:
+      branch:
+        - develop
+  - name: docker_tag
+    image: plugins/docker:19.03.8
+    settings:
+      auto_tag: true
+      username: hsmtkk
+      password:
+        from_secret: dockerhub_token
+      repo: hsmtkk/whoami-rust
   - name: web
+    depends_on:
+      - docker_latest
     environment:
       HTTP_PORT: 8000
     image: hsmtkk/whoami-rust:latest
     detach: true
   - name: web_test
+    depends_on:
+      - web
     image: curlimages/curl
     commands:
       - curl http://web:8000
